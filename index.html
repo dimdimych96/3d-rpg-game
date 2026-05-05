@@ -197,6 +197,138 @@
             from { transform: translateX(300px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        #saveButtons {
+            position: absolute;
+            top: 200px;
+            left: 20px;
+            z-index: 100;
+        }
+        .save-btn {
+            display: block;
+            margin: 5px 0;
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .save-btn:hover {
+            background: rgba(52,152,219,0.8);
+            border-color: #3498db;
+        }
+        #shopModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            padding: 30px;
+            z-index: 200;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: white;
+        }
+        #shopOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 199;
+        }
+        .shop-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            border-left: 4px solid #ffd700;
+        }
+        .shop-item:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .shop-buy-btn {
+            padding: 8px 20px;
+            background: #27ae60;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .shop-buy-btn:hover {
+            background: #2ecc71;
+        }
+        .shop-buy-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+        }
+        .shop-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 30px;
+            cursor: pointer;
+            color: white;
+        }
+        #skillsModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            border: 3px solid #9b59b6;
+            border-radius: 15px;
+            padding: 30px;
+            z-index: 200;
+            max-width: 500px;
+            color: white;
+        }
+        #skillsOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 199;
+        }
+        .skill-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(155,89,182,0.2);
+            border-radius: 10px;
+            border-left: 4px solid #9b59b6;
+        }
+        .skill-upgrade-btn {
+            padding: 8px 15px;
+            background: #9b59b6;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .skill-upgrade-btn:hover {
+            background: #8e44ad;
+        }
+        .skill-upgrade-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -225,6 +357,30 @@
             <div><strong>Золото:</strong> <span id="gold">0</span></div>
             <div id="weaponInfo" style="margin-top: 5px;"><strong>Оружие:</strong> Кулаки</div>
         </div>
+    </div>
+
+    <div id="saveButtons">
+        <button class="save-btn" onclick="saveGame()">💾 Сохранить</button>
+        <button class="save-btn" onclick="loadGame()">📂 Загрузить</button>
+        <button class="save-btn" onclick="if(confirm('Удалить сохранение?')) deleteSave()">🗑️ Удалить</button>
+        <button class="save-btn" onclick="openShop()">🏪 Магазин</button>
+        <button class="save-btn" onclick="openSkills()">⭐ Навыки (<span id="skillPointsBtn">0</span>)</button>
+    </div>
+
+    <div id="shopOverlay" onclick="closeShop()"></div>
+    <div id="shopModal">
+        <span class="shop-close" onclick="closeShop()">&times;</span>
+        <h2 style="text-align: center; color: #ffd700;">🏪 Магазин торговца</h2>
+        <p style="text-align: center; margin-bottom: 20px;">Ваше золото: <span id="shopGold">0</span> 💰</p>
+        <div id="shopItems"></div>
+    </div>
+
+    <div id="skillsOverlay" onclick="closeSkills()"></div>
+    <div id="skillsModal">
+        <span class="shop-close" onclick="closeSkills()">&times;</span>
+        <h2 style="text-align: center; color: #9b59b6;">⭐ Дерево навыков</h2>
+        <p style="text-align: center; margin-bottom: 20px;">Очки навыков: <span id="skillPoints">0</span></p>
+        <div id="skillsList"></div>
     </div>
 
     <div id="instructions">
@@ -260,6 +416,9 @@
         <div>Убито врагов: <span id="killCount">0</span></div>
         <div>Собрано предметов: <span id="itemCount">0</span></div>
         <div>Время игры: <span id="playTime">0:00</span></div>
+        <div style="margin-top: 10px;">
+            <strong>🌍 Время:</strong> <span id="timeOfDay">День</span>
+        </div>
     </div>
 
     <div id="achievements">
@@ -287,6 +446,8 @@
         let coins = [];
         let enemies = [];
         let items = [];
+        let chests = [];
+        let shopkeeper;
         let gameActive = true;
 
         // Player stats
@@ -301,7 +462,27 @@
             strength: 10,
             gold: 0,
             weapon: null,
-            hasShield: false
+            hasShield: false,
+            skillPoints: 0
+        };
+
+        // Skills system
+        let playerSkills = {
+            vitality: 0,      // +10 HP per level
+            endurance: 0,     // +10 Mana per level
+            power: 0,         // +3 Strength per level
+            agility: 0,       // +10% speed per level
+            fortune: 0,       // +20% gold per level
+            regeneration: 0   // HP/Mana regen per level
+        };
+
+        const skillsData = {
+            vitality: { name: 'Живучесть', emoji: '❤️', desc: '+10 макс. HP', maxLevel: 10 },
+            endurance: { name: 'Выносливость', emoji: '💙', desc: '+10 макс. маны', maxLevel: 10 },
+            power: { name: 'Мощь', emoji: '💪', desc: '+3 силы', maxLevel: 10 },
+            agility: { name: 'Ловкость', emoji: '⚡', desc: '+10% скорости', maxLevel: 5 },
+            fortune: { name: 'Удача', emoji: '🍀', desc: '+20% золота', maxLevel: 5 },
+            regeneration: { name: 'Регенерация', emoji: '✨', desc: 'Восстановление HP/маны', maxLevel: 5 }
         };
 
         // Spell cooldowns
@@ -329,6 +510,222 @@
 
         let minimapCanvas, minimapCtx;
 
+        // Day/Night cycle
+        let dayTime = 0; // 0 to 1 (0 = midnight, 0.5 = noon)
+        let daySpeed = 0.0001; // Speed of day/night cycle
+        let skyMesh, sunLight;
+
+        // Shop system
+        const shopItems = [
+            { name: 'Зелье здоровья', emoji: '🧪', price: 50, type: 'HEALTH_POTION', desc: 'Восстанавливает 50 HP' },
+            { name: 'Зелье силы', emoji: '💪', price: 100, type: 'STRENGTH_POTION', desc: '+5 к силе навсегда' },
+            { name: 'Меч', emoji: '⚔️', price: 200, type: 'SWORD', desc: 'Урон: 25, Скорость: 1.0' },
+            { name: 'Топор', emoji: '🪓', price: 250, type: 'AXE', desc: 'Урон: 35, Скорость: 0.7' },
+            { name: 'Лук', emoji: '🏹', price: 180, type: 'BOW', desc: 'Урон: 20, Скорость: 1.5' },
+            { name: 'Посох', emoji: '🪄', price: 220, type: 'STAFF', desc: 'Урон: 30, Скорость: 0.9' },
+            { name: 'Улучшение HP', emoji: '❤️', price: 150, type: 'UPGRADE_HP', desc: '+20 к максимальному HP' },
+            { name: 'Улучшение маны', emoji: '💙', price: 150, type: 'UPGRADE_MANA', desc: '+20 к максимальной мане' }
+        ];
+
+        function openShop() {
+            document.getElementById('shopOverlay').style.display = 'block';
+            document.getElementById('shopModal').style.display = 'block';
+            document.getElementById('shopGold').textContent = playerStats.gold;
+
+            const shopItemsContainer = document.getElementById('shopItems');
+            shopItemsContainer.innerHTML = '';
+
+            shopItems.forEach((item, index) => {
+                const canAfford = playerStats.gold >= item.price;
+                const isFull = inventory.length >= maxInventorySlots && !item.type.startsWith('UPGRADE');
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'shop-item';
+                itemDiv.innerHTML = `
+                    <div>
+                        <div style="font-size: 20px;">${item.emoji} ${item.name}</div>
+                        <div style="font-size: 12px; color: #bdc3c7; margin-top: 5px;">${item.desc}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 18px; color: #ffd700; margin-bottom: 5px;">${item.price} 💰</div>
+                        <button class="shop-buy-btn" onclick="buyItem(${index})" ${!canAfford || isFull ? 'disabled' : ''}>
+                            ${!canAfford ? 'Недостаточно золота' : (isFull ? 'Инвентарь полон' : 'Купить')}
+                        </button>
+                    </div>
+                `;
+                shopItemsContainer.appendChild(itemDiv);
+            });
+        }
+
+        function closeShop() {
+            document.getElementById('shopOverlay').style.display = 'none';
+            document.getElementById('shopModal').style.display = 'none';
+        }
+
+        function buyItem(index) {
+            const item = shopItems[index];
+
+            if (playerStats.gold < item.price) {
+                showMessage('Недостаточно золота!', player.position);
+                return;
+            }
+
+            if (item.type.startsWith('UPGRADE')) {
+                // Handle upgrades
+                playerStats.gold -= item.price;
+
+                if (item.type === 'UPGRADE_HP') {
+                    playerStats.maxHp += 20;
+                    playerStats.hp += 20;
+                    showMessage('+20 макс. HP!', player.position);
+                } else if (item.type === 'UPGRADE_MANA') {
+                    playerStats.maxMana += 20;
+                    playerStats.mana += 20;
+                    showMessage('+20 макс. маны!', player.position);
+                }
+
+                playSound(800, 0.2);
+                updateHUD();
+                openShop(); // Refresh shop
+            } else {
+                // Handle items
+                if (inventory.length >= maxInventorySlots) {
+                    showMessage('Инвентарь полон!', player.position);
+                    return;
+                }
+
+                playerStats.gold -= item.price;
+                const itemData = itemTypes[item.type];
+                inventory.push({ type: item.type, data: itemData });
+
+                showMessage(`Куплено: ${item.name}`, player.position);
+                playSound(600, 0.2);
+
+                updateInventoryUI();
+                updateHUD();
+                openShop(); // Refresh shop
+            }
+        }
+
+        function createShopkeeper() {
+            const shopkeeperGroup = new THREE.Group();
+
+            // Body
+            const bodyGeometry = new THREE.BoxGeometry(0.8, 1.2, 0.6);
+            const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = 0.6;
+            body.castShadow = true;
+            shopkeeperGroup.add(body);
+
+            // Head
+            const headGeometry = new THREE.SphereGeometry(0.35, 16, 16);
+            const headMaterial = new THREE.MeshStandardMaterial({ color: 0xffdbac });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            head.position.y = 1.5;
+            head.castShadow = true;
+            shopkeeperGroup.add(head);
+
+            // Hat
+            const hatGeometry = new THREE.ConeGeometry(0.4, 0.6, 8);
+            const hatMaterial = new THREE.MeshStandardMaterial({ color: 0x4b0082 });
+            const hat = new THREE.Mesh(hatGeometry, hatMaterial);
+            hat.position.y = 2.0;
+            hat.castShadow = true;
+            shopkeeperGroup.add(hat);
+
+            // Shop sign
+            const signGeometry = new THREE.BoxGeometry(1.5, 1.0, 0.1);
+            const signMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700 });
+            const sign = new THREE.Mesh(signGeometry, signMaterial);
+            sign.position.set(0, 2.5, 0);
+            sign.castShadow = true;
+            shopkeeperGroup.add(sign);
+
+            // Glow
+            const shopLight = new THREE.PointLight(0xffd700, 2, 5);
+            shopLight.position.set(0, 2, 0);
+            shopkeeperGroup.add(shopLight);
+
+            shopkeeperGroup.position.set(10, 0.5, 10);
+            shopkeeper = shopkeeperGroup;
+            scene.add(shopkeeper);
+        }
+
+        function checkShopkeeperInteraction() {
+            if (shopkeeper && checkCollision(player, shopkeeper)) {
+                if (!document.getElementById('shopModal').style.display || document.getElementById('shopModal').style.display === 'none') {
+                    showMessage('Нажми кнопку "Магазин" для торговли', player.position);
+                }
+            }
+        }
+
+        function openSkills() {
+            document.getElementById('skillsOverlay').style.display = 'block';
+            document.getElementById('skillsModal').style.display = 'block';
+            document.getElementById('skillPoints').textContent = playerStats.skillPoints;
+            document.getElementById('skillPointsBtn').textContent = playerStats.skillPoints;
+
+            const skillsList = document.getElementById('skillsList');
+            skillsList.innerHTML = '';
+
+            Object.keys(skillsData).forEach(skillKey => {
+                const skill = skillsData[skillKey];
+                const currentLevel = playerSkills[skillKey];
+                const canUpgrade = playerStats.skillPoints > 0 && currentLevel < skill.maxLevel;
+
+                const skillDiv = document.createElement('div');
+                skillDiv.className = 'skill-item';
+                skillDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 18px;">${skill.emoji} ${skill.name}</div>
+                            <div style="font-size: 12px; color: #bdc3c7; margin-top: 5px;">${skill.desc}</div>
+                            <div style="margin-top: 5px; color: #9b59b6;">Уровень: ${currentLevel}/${skill.maxLevel}</div>
+                        </div>
+                        <button class="skill-upgrade-btn" onclick="upgradeSkill('${skillKey}')" ${!canUpgrade ? 'disabled' : ''}>
+                            ${currentLevel >= skill.maxLevel ? 'Макс.' : 'Улучшить'}
+                        </button>
+                    </div>
+                `;
+                skillsList.appendChild(skillDiv);
+            });
+        }
+
+        function closeSkills() {
+            document.getElementById('skillsOverlay').style.display = 'none';
+            document.getElementById('skillsModal').style.display = 'none';
+        }
+
+        function upgradeSkill(skillKey) {
+            if (playerStats.skillPoints <= 0) return;
+            if (playerSkills[skillKey] >= skillsData[skillKey].maxLevel) return;
+
+            playerStats.skillPoints--;
+            playerSkills[skillKey]++;
+
+            // Apply skill effects
+            switch(skillKey) {
+                case 'vitality':
+                    playerStats.maxHp += 10;
+                    playerStats.hp += 10;
+                    break;
+                case 'endurance':
+                    playerStats.maxMana += 10;
+                    playerStats.mana += 10;
+                    break;
+                case 'power':
+                    playerStats.strength += 3;
+                    break;
+            }
+
+            showMessage(`⭐ ${skillsData[skillKey].name} улучшен!`, player.position);
+            playSound(900, 0.2);
+
+            updateHUD();
+            openSkills(); // Refresh
+        }
+
         // Achievements
         let unlockedAchievements = [];
         const achievements = [
@@ -342,6 +739,292 @@
 
         // Audio context for sound effects
         let audioCtx;
+
+        // Save/Load system
+        function saveGame() {
+            const saveData = {
+                playerStats: playerStats,
+                playerSkills: playerSkills,
+                inventory: inventory,
+                gameStats: gameStats,
+                unlockedAchievements: unlockedAchievements,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('rpg_save', JSON.stringify(saveData));
+            showMessage('💾 Игра сохранена', player.position);
+        }
+
+        function loadGame() {
+            const saveData = localStorage.getItem('rpg_save');
+            if (saveData) {
+                try {
+                    const data = JSON.parse(saveData);
+
+                    // Restore player stats
+                    playerStats = data.playerStats;
+                    playerSkills = data.playerSkills || {
+                        vitality: 0,
+                        endurance: 0,
+                        power: 0,
+                        agility: 0,
+                        fortune: 0,
+                        regeneration: 0
+                    };
+                    inventory = data.inventory || [];
+                    gameStats = data.gameStats || { killCount: 0, itemCount: 0, startTime: Date.now() };
+                    unlockedAchievements = data.unlockedAchievements || [];
+
+                    updateHUD();
+                    updateInventoryUI();
+                    updateStats();
+                    document.getElementById('skillPointsBtn').textContent = playerStats.skillPoints;
+
+                    showMessage('✅ Прогресс загружен', player.position);
+                    return true;
+                } catch (e) {
+                    console.error('Failed to load save:', e);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        function deleteSave() {
+            localStorage.removeItem('rpg_save');
+            showMessage('🗑️ Сохранение удалено', player.position);
+        }
+
+        // Auto-save every 30 seconds
+        setInterval(() => {
+            if (gameActive) {
+                saveGame();
+            }
+        }, 30000);
+
+        function spawnChest() {
+            const chestGroup = new THREE.Group();
+
+            // Chest body
+            const bodyGeometry = new THREE.BoxGeometry(0.8, 0.6, 0.6);
+            const bodyMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8b4513,
+                metalness: 0.2,
+                roughness: 0.8
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = 0.3;
+            body.castShadow = true;
+            chestGroup.add(body);
+
+            // Chest lid
+            const lidGeometry = new THREE.BoxGeometry(0.85, 0.15, 0.65);
+            const lid = new THREE.Mesh(lidGeometry, bodyMaterial);
+            lid.position.y = 0.675;
+            lid.castShadow = true;
+            chestGroup.add(lid);
+
+            // Lock
+            const lockGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.1);
+            const lockMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffd700,
+                metalness: 0.9,
+                roughness: 0.1
+            });
+            const lock = new THREE.Mesh(lockGeometry, lockMaterial);
+            lock.position.set(0, 0.4, 0.35);
+            chestGroup.add(lock);
+
+            // Glow effect
+            const glowLight = new THREE.PointLight(0xffd700, 1, 3);
+            glowLight.position.set(0, 0.8, 0);
+            chestGroup.add(glowLight);
+
+            chestGroup.position.x = (Math.random() - 0.5) * 80;
+            chestGroup.position.z = (Math.random() - 0.5) * 80;
+            chestGroup.position.y = 0;
+
+            chestGroup.userData = {
+                opened: false,
+                lid: lid,
+                rarity: Math.random() < 0.2 ? 'legendary' : (Math.random() < 0.5 ? 'rare' : 'common')
+            };
+
+            chests.push(chestGroup);
+            scene.add(chestGroup);
+        }
+
+        function openChest(chest) {
+            if (chest.userData.opened) return;
+
+            chest.userData.opened = true;
+
+            // Animate lid opening
+            const lid = chest.userData.lid;
+            let angle = 0;
+            const openAnimation = setInterval(() => {
+                angle += 0.1;
+                lid.rotation.x = -angle;
+                lid.position.z += 0.01;
+                lid.position.y += 0.005;
+
+                if (angle >= Math.PI / 2) {
+                    clearInterval(openAnimation);
+                }
+            }, 16);
+
+            // Generate loot based on rarity
+            const rarity = chest.userData.rarity;
+            let loot = [];
+
+            if (rarity === 'legendary') {
+                loot = [
+                    { gold: 200 + Math.floor(Math.random() * 100) },
+                    { xp: 500 },
+                    { item: Math.random() < 0.5 ? 'SWORD' : 'STAFF' }
+                ];
+                showMessage('🌟 ЛЕГЕНДАРНЫЙ СУНДУК! 🌟', chest.position);
+                playSound(1000, 0.3);
+            } else if (rarity === 'rare') {
+                loot = [
+                    { gold: 100 + Math.floor(Math.random() * 50) },
+                    { xp: 200 },
+                    { item: Math.random() < 0.7 ? 'HEALTH_POTION' : 'STRENGTH_POTION' }
+                ];
+                showMessage('💎 Редкий сундук!', chest.position);
+                playSound(800, 0.2);
+            } else {
+                loot = [
+                    { gold: 50 + Math.floor(Math.random() * 30) },
+                    { xp: 100 }
+                ];
+                showMessage('📦 Сундук открыт', chest.position);
+                playSound(600, 0.2);
+            }
+
+            // Give loot
+            setTimeout(() => {
+                loot.forEach(reward => {
+                    if (reward.gold) {
+                        gainGold(reward.gold);
+                        showMessage(`+${reward.gold} золота`, chest.position);
+                    }
+                    if (reward.xp) {
+                        gainXP(reward.xp);
+                        showMessage(`+${reward.xp} XP`, chest.position);
+                    }
+                    if (reward.item && inventory.length < maxInventorySlots) {
+                        const itemData = itemTypes[reward.item];
+                        inventory.push({ type: reward.item, data: itemData });
+                        updateInventoryUI();
+                        showMessage(`Получено: ${itemData.name}`, chest.position);
+                    }
+                });
+
+                createParticles(chest.position, 0xffd700, 50);
+            }, 500);
+        }
+
+        function checkChestInteraction() {
+            for (let chest of chests) {
+                if (!chest.userData.opened && checkCollision(player, chest)) {
+                    openChest(chest);
+                }
+            }
+        }
+
+        function updateDayNightCycle() {
+            dayTime += daySpeed;
+            if (dayTime > 1) dayTime = 0;
+
+            // Calculate sun position
+            const sunAngle = dayTime * Math.PI * 2;
+            const sunHeight = Math.sin(sunAngle) * 30;
+            const sunDistance = Math.cos(sunAngle) * 30;
+
+            sunLight.position.set(sunDistance, Math.max(sunHeight, 5), 10);
+
+            // Update light intensity based on time
+            const isDay = sunHeight > 0;
+            const intensity = isDay ? 0.8 : 0.2;
+            sunLight.intensity = intensity;
+
+            // Update time of day display
+            let timeOfDayText;
+            if (dayTime < 0.25) {
+                timeOfDayText = '🌙 Ночь';
+            } else if (dayTime < 0.3) {
+                timeOfDayText = '🌅 Рассвет';
+            } else if (dayTime < 0.7) {
+                timeOfDayText = '☀️ День';
+            } else if (dayTime < 0.75) {
+                timeOfDayText = '🌇 Закат';
+            } else {
+                timeOfDayText = '🌙 Ночь';
+            }
+            document.getElementById('timeOfDay').textContent = timeOfDayText;
+
+            // Update sky color
+            let skyColor;
+            if (dayTime < 0.25) { // Night to dawn
+                const t = dayTime / 0.25;
+                skyColor = lerpColor(0x000033, 0xff6b35, t);
+            } else if (dayTime < 0.3) { // Dawn
+                const t = (dayTime - 0.25) / 0.05;
+                skyColor = lerpColor(0xff6b35, 0x87ceeb, t);
+            } else if (dayTime < 0.7) { // Day
+                skyColor = 0x87ceeb;
+            } else if (dayTime < 0.75) { // Dusk
+                const t = (dayTime - 0.7) / 0.05;
+                skyColor = lerpColor(0x87ceeb, 0xff6b35, t);
+            } else { // Night
+                const t = (dayTime - 0.75) / 0.25;
+                skyColor = lerpColor(0xff6b35, 0x000033, t);
+            }
+
+            skyMesh.material.color.setHex(skyColor);
+            scene.background = new THREE.Color(skyColor);
+
+            // Ambient light changes
+            const ambientIntensity = isDay ? 0.6 : 0.3;
+            scene.children.forEach(child => {
+                if (child instanceof THREE.AmbientLight) {
+                    child.intensity = ambientIntensity;
+                }
+            });
+
+            // Night enemies are stronger
+            if (!isDay) {
+                enemies.forEach(enemy => {
+                    if (!enemy.userData.nightBuff) {
+                        enemy.userData.nightBuff = true;
+                        enemy.userData.speed *= 1.2;
+                    }
+                });
+            } else {
+                enemies.forEach(enemy => {
+                    if (enemy.userData.nightBuff) {
+                        enemy.userData.nightBuff = false;
+                        enemy.userData.speed /= 1.2;
+                    }
+                });
+            }
+        }
+
+        function lerpColor(color1, color2, t) {
+            const r1 = (color1 >> 16) & 0xff;
+            const g1 = (color1 >> 8) & 0xff;
+            const b1 = color1 & 0xff;
+
+            const r2 = (color2 >> 16) & 0xff;
+            const g2 = (color2 >> 8) & 0xff;
+            const b2 = color2 & 0xff;
+
+            const r = Math.floor(r1 + (r2 - r1) * t);
+            const g = Math.floor(g1 + (g2 - g1) * t);
+            const b = Math.floor(b1 + (b2 - b1) * t);
+
+            return (r << 16) | (g << 8) | b;
+        }
 
         function initAudio() {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -466,6 +1149,7 @@
             directionalLight.shadow.mapSize.width = 2048;
             directionalLight.shadow.mapSize.height = 2048;
             scene.add(directionalLight);
+            sunLight = directionalLight;
 
             const groundGeometry = new THREE.PlaneGeometry(100, 100, 10, 10);
             const groundMaterial = new THREE.MeshStandardMaterial({
@@ -496,6 +1180,7 @@
             });
             const sky = new THREE.Mesh(skyGeometry, skyMaterial);
             scene.add(sky);
+            skyMesh = sky;
 
             // Create player with better model
             const playerGroup = new THREE.Group();
@@ -577,6 +1262,12 @@
             for (let i = 0; i < 5; i++) {
                 spawnEnemy();
             }
+            for (let i = 0; i < 3; i++) {
+                spawnChest();
+            }
+
+            // Create shopkeeper NPC
+            createShopkeeper();
 
             camera.position.set(0, 8, 12);
             camera.lookAt(0, 0, 0);
@@ -598,6 +1289,12 @@
             updateHUD();
             initQuests();
             initMinimap();
+
+            // Try to load saved game
+            const hasSave = loadGame();
+            if (hasSave) {
+                console.log('Game loaded from save');
+            }
 
             animate();
         }
@@ -1285,6 +1982,37 @@
                 ctx.fill();
             });
 
+            // Draw chests (golden squares)
+            chests.forEach(chest => {
+                if (!chest.userData.opened) {
+                    const x = ((chest.position.x + 48) * scale);
+                    const y = ((chest.position.z + 48) * scale);
+                    ctx.fillStyle = chest.userData.rarity === 'legendary' ? '#ff00ff' : '#ffd700';
+                    ctx.fillRect(x - 3, y - 3, 6, 6);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(x - 3, y - 3, 6, 6);
+                }
+            });
+
+            // Draw shopkeeper (green star)
+            if (shopkeeper) {
+                const x = ((shopkeeper.position.x + 48) * scale);
+                const y = ((shopkeeper.position.z + 48) * scale);
+                ctx.fillStyle = '#00ff00';
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * 4 * Math.PI / 5) - Math.PI / 2;
+                    const radius = i % 2 === 0 ? 5 : 2;
+                    const px = x + Math.cos(angle) * radius;
+                    const py = y + Math.sin(angle) * radius;
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fill();
+            }
+
             // Draw enemies (red squares)
             enemies.forEach(enemy => {
                 const x = ((enemy.position.x + 48) * scale);
@@ -1422,8 +2150,12 @@
             let isSprinting = false;
             let isMoving = false;
 
+            // Apply agility skill bonus
+            const agilityBonus = 1 + (playerSkills.agility * 0.1);
+            const baseSpeed = playerSpeed * agilityBonus;
+
             if (keys.shift && playerStats.mana > 0 && (keys.w || keys.a || keys.s || keys.d)) {
-                currentSpeed = sprintSpeed;
+                currentSpeed = sprintSpeed * agilityBonus;
                 isSprinting = true;
                 playerStats.mana -= sprintManaCost;
                 if (playerStats.mana < 0) playerStats.mana = 0;
@@ -1432,6 +2164,8 @@
                 if (Math.random() < 0.3) {
                     createParticles(player.position, 0x3498db, 2);
                 }
+            } else {
+                currentSpeed = baseSpeed;
             }
 
             // Calculate movement direction for rotation
@@ -1701,8 +2435,10 @@
             playerStats.maxMana += 20;
             playerStats.mana = playerStats.maxMana;
             playerStats.strength += 5;
+            playerStats.skillPoints += 2; // 2 skill points per level
 
             showMessage('🎉 УРОВЕНЬ ПОВЫШЕН! 🎉', player.position);
+            showMessage('+2 очка навыков!', player.position);
             createParticles(player.position, 0xffd700, 50);
 
             // Level up sound
@@ -1713,10 +2449,15 @@
             updateQuestProgress('level', playerStats.level);
             checkAchievements();
             updateHUD();
+            document.getElementById('skillPointsBtn').textContent = playerStats.skillPoints;
         }
 
         function gainGold(amount) {
-            playerStats.gold += amount;
+            // Apply fortune skill bonus
+            const fortuneBonus = 1 + (playerSkills.fortune * 0.2);
+            const finalAmount = Math.floor(amount * fortuneBonus);
+
+            playerStats.gold += finalAmount;
             updateHUD();
         }
 
@@ -1791,12 +2532,22 @@
             updatePlayer();
             updateEnemies();
             checkItemCollection();
+            checkChestInteraction();
+            checkShopkeeperInteraction();
             updateParticles();
             drawMinimap();
+            updateDayNightCycle();
 
             // Mana regeneration
             if (playerStats.mana < playerStats.maxMana) {
-                playerStats.mana = Math.min(playerStats.maxMana, playerStats.mana + 0.1);
+                const regenBonus = 1 + (playerSkills.regeneration * 0.5);
+                playerStats.mana = Math.min(playerStats.maxMana, playerStats.mana + (0.1 * regenBonus));
+                if (Math.random() < 0.01) updateHUD();
+            }
+
+            // HP regeneration from skill
+            if (playerSkills.regeneration > 0 && playerStats.hp < playerStats.maxHp) {
+                playerStats.hp = Math.min(playerStats.maxHp, playerStats.hp + (0.05 * playerSkills.regeneration));
                 if (Math.random() < 0.01) updateHUD();
             }
 
@@ -1850,9 +2601,11 @@
             items.forEach(item => scene.remove(item));
             enemies.forEach(enemy => scene.remove(enemy));
             particles.forEach(particle => scene.remove(particle));
+            chests.forEach(chest => scene.remove(chest));
             items = [];
             enemies = [];
             particles = [];
+            chests = [];
 
             // Reset player position
             player.position.set(0, 0.5, 0);
@@ -1865,6 +2618,9 @@
             }
             for (let i = 0; i < 5; i++) {
                 spawnEnemy();
+            }
+            for (let i = 0; i < 3; i++) {
+                spawnChest();
             }
 
             updateHUD();
